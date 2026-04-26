@@ -463,8 +463,8 @@
             <div class="stat-sub">Konsistensi refleksi</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label"><i class='bx bx-happy' style="color:#fb923c"></i> Mood Dominan</div>
-            <div class="stat-value" style="font-size:18px">{{ $moodDominan }}</div>
+            <div class="stat-label"><i class='bx bx-happy' style="color:#fb923c"></i> Emosi Dominan</div>
+            <div class="stat-value" style="font-size:18px">{{ $emosiDominan }}</div>
             <div class="stat-sub">Paling sering muncul</div>
         </div>
     </div>
@@ -484,46 +484,30 @@
             </div>
         </div>
 
-        {{-- Distribusi Aspek --}}
+        {{-- Distribusi Emosi Donut --}}
         <div class="card">
             <div class="card-header">
                 <div>
-                    <div class="card-title">Distribusi Aspek</div>
-                    <div class="card-subtitle">Fokus area refleksimu</div>
+                    <div class="card-title">Top Kata Emosi</div>
+                    <div class="card-subtitle">Proporsi kata emosi dominan</div>
                 </div>
             </div>
             <div class="chart-sm">
-                <canvas id="aspekChart"></canvas>
+                <canvas id="emosiChart"></canvas>
             </div>
-            <div class="legend-row" id="aspekLegend"></div>
+            <div class="legend-row" id="emosiLegend"></div>
         </div>
     </div>
 
-    {{-- Mood Bar + Kategori --}}
-    <div class="charts-grid">
-        {{-- Distribusi Mood --}}
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <div class="card-title">Distribusi Mood</div>
-                    <div class="card-subtitle">Frekuensi setiap mood yang dicatat</div>
-                </div>
-            </div>
-            <div class="mood-bars" id="moodBars"></div>
-        </div>
-
-        {{-- Distribusi Kategori --}}
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <div class="card-title">Distribusi Kategori</div>
-                    <div class="card-subtitle">Topik refleksi terbanyak</div>
-                </div>
-            </div>
-            <div class="chart-container">
-                <canvas id="kategoriChart"></canvas>
+    {{-- Distribusi Emosi (word frequency) --}}
+    <div class="card-full">
+        <div class="card-header">
+            <div>
+                <div class="card-title">Distribusi Kata Emosi</div>
+                <div class="card-subtitle">Kata yang paling sering muncul dalam catatanmu</div>
             </div>
         </div>
+        <div class="mood-bars" id="emosiBars"></div>
     </div>
 
     {{-- Insight Cards --}}
@@ -534,18 +518,16 @@
                 <div class="insight-card-title">Pola Emosi</div>
             </div>
             <div class="insight-card-desc">
-                Mood <span class="insight-highlight">{{ $moodDominan }}</span> paling sering muncul.
-                {{ $pola_emosi }}
+                Emosi <span class="insight-highlight">{{ $emosiDominan }}</span> paling sering muncul.<br><small style="margin-top:4px;display:block">{!! $pola_emosi !!}</small>
             </div>
         </div>
         <div class="insight-card">
             <div class="insight-card-header">
-                <div class="insight-icon blue">📊</div>
-                <div class="insight-card-title">Fokus Refleksi</div>
+                <div class="insight-icon blue">🧩</div>
+                <div class="insight-card-title">Pola Pikir</div>
             </div>
             <div class="insight-card-desc">
-                Aspek <span class="insight-highlight">{{ $aspekDominan }}</span> paling banyak direfleksikan.
-                {{ $pola_aspek }}
+                {!! $pola_aspek !!}
             </div>
         </div>
         <div class="insight-card">
@@ -565,7 +547,7 @@
             <div class="analisis-icon">✨</div>
             <div class="analisis-title">Analisis Mendalam</div>
         </div>
-        <p class="analisis-text">{{ $analisis_mendalam }}</p>
+        <p class="analisis-text">{!! $analisis_mendalam !!}</p>
     </div>
 
 </main>
@@ -614,17 +596,17 @@ function setPeriod(btn, period) {
     trenChart.update();
 }
 
-// ===== ASPEK DONUT =====
-const aspekData = chartData.aspek;
-const hasAspek = aspekData.some(d => d.value > 0);
+// ===== EMOSI DONUT =====
+const emosiData = chartData.emosi;
+const hasEmosi = emosiData.some(d => d.value > 0);
 
-new Chart(document.getElementById('aspekChart'), {
+new Chart(document.getElementById('emosiChart'), {
     type: 'doughnut',
     data: {
-        labels: aspekData.map(d => d.label),
+        labels: emosiData.map(d => d.label),
         datasets: [{
-            data: hasAspek ? aspekData.map(d => d.value) : [1],
-            backgroundColor: hasAspek ? aspekData.map(d => d.color) : ['#e9d5ff'],
+            data: hasEmosi ? emosiData.map(d => d.value) : [1],
+            backgroundColor: hasEmosi ? emosiData.map(d => d.color) : ['#e9d5ff'],
             borderWidth: 0,
             hoverOffset: 6,
         }]
@@ -633,60 +615,39 @@ new Chart(document.getElementById('aspekChart'), {
         responsive: true,
         maintainAspectRatio: false,
         cutout: '68%',
-        plugins: { legend: { display: false }, tooltip: { enabled: hasAspek } }
+        plugins: { legend: { display: false }, tooltip: { enabled: hasEmosi } }
     }
 });
 
-// Aspek Legend
-const aspekLegend = document.getElementById('aspekLegend');
-aspekData.forEach(d => {
-    aspekLegend.innerHTML += `
+// Emosi Donut Legend
+const emosiLegend = document.getElementById('emosiLegend');
+emosiData.forEach(d => {
+    emosiLegend.innerHTML += `
         <div class="legend-item">
             <div class="legend-dot" style="background:${d.color}"></div>
             <span>${d.label} (${d.value})</span>
         </div>`;
 });
 
-// ===== MOOD BARS =====
-const moodData = chartData.mood;
-const maxMood = Math.max(...moodData.map(d => d.value), 1);
-const moodContainer = document.getElementById('moodBars');
+// ===== EMOSI BARS =====
+const maxEmosi = Math.max(...emosiData.map(d => d.value), 1);
+const emosiBarsEl = document.getElementById('emosiBars');
 
-moodData.forEach(d => {
-    const pct = Math.round((d.value / maxMood) * 100);
-    moodContainer.innerHTML += `
-        <div class="mood-bar-item">
-            <div class="mood-bar-label">${d.emoji} ${d.label}</div>
-            <div class="mood-bar-track">
-                <div class="mood-bar-fill" style="width:${pct}%;background:${d.color}"></div>
-            </div>
-            <div class="mood-bar-count">${d.value}</div>
-        </div>`;
-});
-
-// ===== KATEGORI CHART =====
-const katData = chartData.kategori;
-new Chart(document.getElementById('kategoriChart'), {
-    type: 'bar',
-    data: {
-        labels: katData.map(d => d.label),
-        datasets: [{
-            data: katData.map(d => d.value),
-            backgroundColor: 'rgba(168,85,247,0.7)',
-            borderRadius: 8,
-            borderSkipped: false,
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-            x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#7c6fa0' } },
-            y: { grid: { color: 'rgba(168,85,247,0.07)' }, ticks: { font: { size: 11 }, color: '#7c6fa0', stepSize: 1 }, beginAtZero: true }
-        }
-    }
-});
+if (emosiData.length === 0) {
+    emosiBarsEl.innerHTML = '<p style="font-size:13px;color:#8a7fa0;text-align:center;padding:20px 0">Belum ada data emosi</p>';
+} else {
+    emosiData.forEach(d => {
+        const pct = Math.round((d.value / maxEmosi) * 100);
+        emosiBarsEl.innerHTML += `
+            <div class="mood-bar-item">
+                <div class="mood-bar-label">${d.label}</div>
+                <div class="mood-bar-track">
+                    <div class="mood-bar-fill" style="width:${pct}%;background:${d.color}"></div>
+                </div>
+                <div class="mood-bar-count">${d.value}x</div>
+            </div>`;
+    });
+}
 </script>
 
 </body>

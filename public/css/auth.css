@@ -67,6 +67,19 @@ form{
 	visibility: hidden;
 } 
 
+.form-box.register .input-box {
+    margin: 15px 0;
+}
+
+.form-box.register {
+    padding: 30px 40px;
+}
+
+.form-box.register h1 {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
 .container.active .form-box.register{
 	visibility: visible;
 }

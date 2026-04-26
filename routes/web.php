@@ -14,9 +14,8 @@ Route::get('/auth', function () {
     return view('auth.custom-auth');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard.index');
-});
+// UBAH BAGIAN INI:
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth');
 
 Route::middleware('auth')->group(function () {
     Route::get('/refleksi', [RefleksiController::class, 'create'])->name('refleksi.create');

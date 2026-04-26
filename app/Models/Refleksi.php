@@ -13,31 +13,14 @@ class Refleksi extends Model
 
     protected $fillable = [
         'user_id',
-        'mood_id',
-        'kategori_id',
-        'aspek_id',
-        'judul',
-        'isi_refleksi',
-        'tanggal'
+        'emosi',
+        'mindset',
+        'tindakan',
+        'tanggal',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function mood()
-    {
-        return $this->belongsTo(Mood::class);
-    }
-
-    public function kategori()
-    {
-        return $this->belongsTo(Kategori::class);
-    }
-
-    public function aspek()
-    {
-        return $this->belongsTo(Aspek::class);
     }
 }

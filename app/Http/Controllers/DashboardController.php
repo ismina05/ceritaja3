@@ -11,33 +11,50 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
+        $user   = Auth::user();
         $userId = $user->id;
 
         // ===== STATS =====
-        $totalRefleksi     = Refleksi::where('user_id', $userId)->count();
-        $refleksiBulanIni  = Refleksi::where('user_id', $userId)
+        $totalRefleksi    = Refleksi::where('user_id', $userId)->count();
+        $refleksiBulanIni = Refleksi::where('user_id', $userId)
                                 ->whereMonth('tanggal', Carbon::now()->month)
                                 ->whereYear('tanggal', Carbon::now()->year)
                                 ->count();
 
-        $moodTerbanyak = Refleksi::where('user_id', $userId)
-                            ->join('moods', 'refleksis.mood_id', '=', 'moods.id')
-                            ->selectRaw('moods.nama_mood, moods.emoji, count(*) as total')
-                            ->groupBy('moods.nama_mood', 'moods.emoji')
-                            ->orderByDesc('total')
-                            ->first();
+        // Mood terbanyak → diganti: kata emosi yang paling sering muncul
+        $emosiTerbanyak = null;
+        $moodLabel      = '-';
 
-        $moodLabel = $moodTerbanyak
-            ? $moodTerbanyak->emoji . ' ' . $moodTerbanyak->nama_mood
-            : '-';
+        $refleksis = Refleksi::where('user_id', $userId)->pluck('emosi');
+        if ($refleksis->count() > 0) {
+            $wordCount = [];
+            $positif   = ['senang','bangga','tenang','bersyukur','bahagia','lega','semangat'];
+            $negatif   = ['sedih','cemas','stres','marah','takut','kecewa','lelah','capek'];
+            $netral    = ['biasa','netral','hampa','datar'];
+
+            foreach ($refleksis as $emosi) {
+                $lower = strtolower($emosi);
+                foreach (array_merge($positif, $negatif, $netral) as $kata) {
+                    if (str_contains($lower, $kata)) {
+                        $wordCount[$kata] = ($wordCount[$kata] ?? 0) + 1;
+                    }
+                }
+            }
+
+            if (!empty($wordCount)) {
+                arsort($wordCount);
+                $topKata = array_key_first($wordCount);
+                $emoji   = in_array($topKata, $positif) ? '😊' : (in_array($topKata, $negatif) ? '😔' : '😐');
+                $moodLabel = $emoji . ' ' . ucfirst($topKata);
+            }
+        }
 
         // ===== LINE CHART DATA =====
         // Harian (7 hari terakhir)
         $hariLabels = [];
         $hariData   = [];
         for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i);
+            $date         = Carbon::now()->subDays($i);
             $hariLabels[] = $date->translatedFormat('D');
             $hariData[]   = Refleksi::where('user_id', $userId)
                                 ->whereDate('tanggal', $date->toDateString())
@@ -48,15 +65,15 @@ class DashboardController extends Controller
         $mingguLabels = [];
         $mingguData   = [];
         for ($i = 3; $i >= 0; $i--) {
-            $start = Carbon::now()->startOfWeek()->subWeeks($i);
-            $end   = $start->copy()->endOfWeek();
+            $start          = Carbon::now()->startOfWeek()->subWeeks($i);
+            $end            = $start->copy()->endOfWeek();
             $mingguLabels[] = 'Mg ' . (4 - $i);
             $mingguData[]   = Refleksi::where('user_id', $userId)
                                 ->whereBetween('tanggal', [$start->toDateString(), $end->toDateString()])
                                 ->count();
         }
 
-        // Bulanan (12 bulan terakhir)
+        // Bulanan (12 bulan)
         $bulanLabels = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
         $bulanData   = [];
         for ($i = 1; $i <= 12; $i++) {
@@ -70,7 +87,7 @@ class DashboardController extends Controller
         $tahunLabels = [];
         $tahunData   = [];
         for ($i = 3; $i >= 0; $i--) {
-            $year = Carbon::now()->year - $i;
+            $year          = Carbon::now()->year - $i;
             $tahunLabels[] = (string) $year;
             $tahunData[]   = Refleksi::where('user_id', $userId)
                                 ->whereYear('tanggal', $year)
@@ -78,26 +95,44 @@ class DashboardController extends Controller
         }
 
         $lineChartData = [
-            'hari'   => ['labels' => $hariLabels,   'data' => $hariData],
-            'minggu' => ['labels' => $mingguLabels,  'data' => $mingguData],
-            'bulan'  => ['labels' => $bulanLabels,   'data' => $bulanData],
-            'tahun'  => ['labels' => $tahunLabels,   'data' => $tahunData],
+            'hari'   => ['labels' => $hariLabels,  'data' => $hariData],
+            'minggu' => ['labels' => $mingguLabels, 'data' => $mingguData],
+            'bulan'  => ['labels' => $bulanLabels,  'data' => $bulanData],
+            'tahun'  => ['labels' => $tahunLabels,  'data' => $tahunData],
         ];
 
-        // ===== DONUT CHART (Aspek) =====
-        $aspeks = \App\Models\Aspek::all();
-        $donutChartData = $aspeks->map(function ($aspek) use ($userId) {
-            return [
-                'label' => $aspek->nama_aspek,
-                'value' => Refleksi::where('user_id', $userId)
-                            ->where('aspek_id', $aspek->id)
-                            ->count(),
-                'color' => $aspek->warna ?? '#a855f7',
+        // ===== DONUT CHART (dari kata kunci tindakan) =====
+        $kategoriTindakan = [
+            ['label' => 'Belajar',    'kata' => ['belajar','studi','kuliah','tugas'], 'color' => '#a855f7'],
+            ['label' => 'Produktif',  'kata' => ['selesai','kerja','produktif','menyelesaikan'], 'color' => '#60a5fa'],
+            ['label' => 'Sosial',     'kata' => ['teman','keluarga','bicara','membantu'], 'color' => '#34d399'],
+            ['label' => 'Istirahat',  'kata' => ['istirahat','tidur','santai','libur'], 'color' => '#fb923c'],
+            ['label' => 'Olahraga',   'kata' => ['olahraga','lari','gym','jalan'], 'color' => '#f87171'],
+        ];
+
+        $tindakans      = Refleksi::where('user_id', $userId)->pluck('tindakan');
+        $donutChartData = [];
+
+        foreach ($kategoriTindakan as $kat) {
+            $count = 0;
+            foreach ($tindakans as $t) {
+                $lower = strtolower($t);
+                foreach ($kat['kata'] as $k) {
+                    if (str_contains($lower, $k)) {
+                        $count++;
+                        break;
+                    }
+                }
+            }
+            $donutChartData[] = [
+                'label' => $kat['label'],
+                'value' => $count,
+                'color' => $kat['color'],
             ];
-        })->values()->toArray();
+        }
 
         // ===== INSIGHT =====
-        $insight = $this->generateInsight($userId, $totalRefleksi, $moodTerbanyak);
+        $insight = $this->generateInsight($userId, $totalRefleksi, $moodLabel);
 
         return view('dashboard.index', compact(
             'totalRefleksi',
@@ -109,7 +144,7 @@ class DashboardController extends Controller
         ));
     }
 
-    private function generateInsight($userId, $totalRefleksi, $moodTerbanyak)
+    private function generateInsight($userId, $totalRefleksi, $moodLabel)
     {
         if ($totalRefleksi === 0) {
             return 'Mulai catat refleksi harianmu untuk mendapatkan insight perkembangan diri yang personal dan bermakna.';
@@ -123,8 +158,8 @@ class DashboardController extends Controller
 
         $insight = "Kamu sudah mencatat {$totalRefleksi} refleksi. ";
 
-        if ($moodTerbanyak) {
-            $insight .= "Mood yang paling sering muncul adalah {$moodTerbanyak->emoji} {$moodTerbanyak->nama_mood}. ";
+        if ($moodLabel !== '-') {
+            $insight .= "Emosi yang paling sering muncul adalah {$moodLabel}. ";
         }
 
         if ($mingguIni > 0) {
