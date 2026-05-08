@@ -320,6 +320,7 @@
                 </div>
 
                 <!-- DONUT TINDAKAN -->
+                <!--
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title"><i class='bx bx-pie-chart-alt-2'></i> Distribusi Tindakan</div>
@@ -328,7 +329,8 @@
                         <canvas id="donutChart" class="donut-canvas" width="140" height="140"></canvas>
                         <div class="donut-legend" id="donutLegend"></div>
                     </div>
-                </div>
+                </div> -->
+                
 
             </div>
 
@@ -360,7 +362,7 @@
 
 <script>
 const lineData = @json($lineChartData);
-const donutData = @json($donutChartData);
+// const donutData = @json($donutChartData); 
 
 // ── TREN CHART ──
 const trenCtx = document.getElementById('trenChart').getContext('2d');
@@ -398,6 +400,7 @@ function switchTren(period, btn) {
     trenChart.update();
 }
 
+/*
 // ── DONUT CHART ──
 const donutCtx = document.getElementById('donutChart').getContext('2d');
 const donutFiltered = donutData.filter(d => d.value > 0);
@@ -432,6 +435,7 @@ legendSource.forEach(d => {
             <span class="legend-val">${d.value}x</span>
         </div>`;
 });
+*/
 </script>
 
 </body>
