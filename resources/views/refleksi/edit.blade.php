@@ -12,14 +12,14 @@
         html, body { overflow-x: hidden; width: 100%; }
 
         :root {
-            --sidebar-bg: #18122b;
+            --sidebar-bg: #2d1b5e;
             --sidebar-w: 66px;
             --ink: #1c1528;
             --ink-muted: #8a7fa0;
             --ink-faint: #c5bcd8;
             --page: #f5f1eb;
             --card: #fffdf9;
-            --accent: #7b52d4;
+            --accent: #a855f7;
             --accent-soft: #ede8fb;
             --warm: #e8dcc8;
             --warm-dark: #d4c4a8;

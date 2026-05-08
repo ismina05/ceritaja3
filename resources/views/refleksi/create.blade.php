@@ -5,30 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Refleksi Hari Ini — CeritaJa</title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    
     <style>
+         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { overflow-x: hidden; width: 100%; }
 
         :root {
-            --sidebar-bg: #18122b;
+            --sidebar-bg: #2d1b5e;
             --sidebar-w: 66px;
-            --ink: #1c1528;
-            --ink-muted: #8a7fa0;
+            --ink: #1e1b4b;             /* ganti */
+            --ink-muted: #7c6fa0; 
             --ink-faint: #c5bcd8;
-            --page: #f5f1eb;
-            --card: #fffdf9;
-            --accent: #7b52d4;
-            --accent-soft: #ede8fb;
-            --warm: #e8dcc8;
-            --warm-dark: #d4c4a8;
+            --page: #f3eeff;
+            --card: #ffffff;
+            --accent: #a855f7;
+            --accent-soft: #f3e8ff;
+            --warm: #e9d5ff;
+            --warm-dark: #d8b4fe;
             --border: rgba(123,82,212,0.1);
             --radius: 20px;
             --shadow: 0 2px 8px rgba(28,21,40,0.06), 0 8px 28px rgba(28,21,40,0.05);
         }
 
         body {
-            font-family: 'Epilogue', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--page);
             display: flex;
             min-height: 100vh;
@@ -142,13 +144,17 @@
         .hero-date i { font-size: 13px; color: rgba(123,82,212,0.9); }
 
         .hero-title {
-            font-family: 'Lora', serif;
+            font-family: 'Plus Jakarta Sans', serif;
             font-size: 36px; font-weight: 400;
-            color: white; line-height: 1.2;
+            font-weight: 700;
+            color: white; 
+            line-height: 1.2;
             letter-spacing: -0.5px;
             margin-bottom: 10px;
         }
-        .hero-title em { font-style: italic; color: #c4a8f8; }
+        .hero-title em {
+            font-weight: 700; 
+            color: #c4a8f8; }
 
         .hero-sub {
             font-size: 14px; color: rgba(255,255,255,0.45);
@@ -202,7 +208,7 @@
 
         .block-meta { flex: 1; }
         .block-title {
-            font-family: 'Lora', serif;
+            font-family: 'Plus Jakarta Sans', serif;
             font-size: 17px; font-weight: 500;
             color: var(--ink); line-height: 1.3;
             margin-bottom: 4px;
@@ -222,7 +228,7 @@
             border: 1.5px solid rgba(28,21,40,0.08);
             border-radius: 13px;
             font-size: 14.5px;
-            font-family: 'Epilogue', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--ink);
             background: var(--page);
             outline: none;
@@ -246,9 +252,12 @@
             margin-top: 7px;
         }
         .textarea-tag {
-            font-size: 11px; color: var(--ink-faint);
-            background: var(--warm); padding: 3px 9px;
-            border-radius: 20px; font-weight: 500;
+            font-size: 11px; color: 
+            var(--ink-faint);
+            background: #2d1b5e; 
+            padding: 3px 9px;
+            border-radius: 20px; 
+            font-weight: 500;
         }
         .char-count { font-size: 11px; color: var(--ink-faint); }
 
@@ -405,7 +414,7 @@
         <div class="hero-content">
             <div class="hero-date"><i class='bx bx-calendar'></i> <span id="heroDate"></span></div>
             <h1 class="hero-title">Gimana hari <em>kamu?</em></h1>
-            <p class="hero-sub">Tulis pengalamanmu dengan jujur — tidak ada jawaban benar atau salah.</p>
+            <p class="hero-sub">Tulis pengalamanmu dengan jujur, tidak ada jawaban benar atau salah.</p>
         </div>
     </div>
 
@@ -463,7 +472,7 @@
                         <div class="block-icon icon-pikir"><i class='bx bx-brain'></i></div>
                         <div class="block-meta">
                             <div class="block-title">Apa yang kamu pikirkan hari ini?</div>
-                            <div class="block-hint">Ceritakan cara pikirmu — bukan penilaian, tapi pengamatan.</div>
+                            <div class="block-hint">Ceritakan cara pikirmu bukan penilaian, tapi pengamatan.</div>
                         </div>
                     </div>
                     <div class="block-body">
@@ -500,7 +509,7 @@
                             required
                             oninput="updateCount('txtTindakan','cntTindakan')">{{ old('tindakan') }}</textarea>
                         <div class="textarea-footer">
-                            <span class="textarea-tag">Perilaku & respons</span>
+                            <span class="">Perilaku dan Respons</span>
                             <span class="char-count"><span id="cntTindakan">0</span> karakter</span>
                         </div>
                         @error('tindakan')<p class="error-msg">{{ $message }}</p>@enderror

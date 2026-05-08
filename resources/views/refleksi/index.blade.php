@@ -12,7 +12,7 @@
         html, body { overflow-x: hidden; width: 100%; }
 
         :root {
-            --sidebar-bg: #5e1b4a;
+            --sidebar-bg: #2d1b5e;
             --sidebar-width: 70px;
             --accent: #a855f7;
             --accent-light: #e9d5ff;

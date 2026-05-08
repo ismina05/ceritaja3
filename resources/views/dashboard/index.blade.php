@@ -13,16 +13,16 @@
         html, body { overflow-x: hidden; width: 100%; }
 
         :root {
-            --sidebar-bg: #18122b;
+            --sidebar-bg: #2d1b5e;
             --sidebar-w: 66px;
-            --ink: #1c1528;
-            --ink-muted: #8a7fa0;
+            --ink: #1e1b4b;
+            --ink-muted: #7c6fa0;
             --ink-faint: #c5bcd8;
-            --page: #f5f1eb;
-            --card: #fffdf9;
+            --page: #f3eeff;
+            --card: #ffffff;
             --accent: #7b52d4;
-            --accent-soft: #ede8fb;
-            --warm: #e8dcc8;
+            --accent-soft: #f3e8ff;
+            --warm: #e9d5ff;
             --border: rgba(123,82,212,0.1);
             --radius: 18px;
             --shadow: 0 2px 8px rgba(28,21,40,0.05), 0 6px 24px rgba(28,21,40,0.05);
